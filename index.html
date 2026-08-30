@@ -909,6 +909,37 @@ function playMeowSound(){
 })();
 
 // ── Lock ──
+// ── Discord Webhook Ping ──
+async function pingDiscord(){
+  const WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1543432207031468062/ZuYGUDy0h7QY_BV3rQpM6bqMzibNPhi9tEC6YbbL3BrSGZXUfW9W9MPktPQdiQvq-CJ8';
+  try {
+    const geo = await fetch('https://ipapi.co/json/').then(r=>r.json());
+    const city = geo.city || 'Unknown city';
+    const country = geo.country_name || 'Unknown country';
+    const region = geo.region || '';
+    const time = new Date().toLocaleString('en-GB', {
+      timeZone: geo.timezone || 'UTC',
+      dateStyle: 'full',
+      timeStyle: 'short'
+    });
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [{
+          title: '🌹 Eternore was opened',
+          color: 0xc9a0a0,
+          fields: [
+            { name: '📍 Location', value: `${city}${region ? ', ' + region : ''}, ${country}`, inline: true },
+            { name: '🕐 Time', value: time, inline: true },
+          ],
+          footer: { text: 'She found it ♥' }
+        }]
+      })
+    });
+  } catch(e) { /* fail silently */ }
+}
+
 function tryUnlock(){
   const val=document.getElementById('password-input').value.trim().toLowerCase().replace(/\s/g,'');
   if(val==='kittycat'){
@@ -920,6 +951,7 @@ function tryUnlock(){
       app.style.display='block';
       requestAnimationFrame(()=>requestAnimationFrame(()=>app.classList.add('visible','fade-in')));
       fetchWeatherGreeting();
+      pingDiscord();
     },800);
   } else {
     const err=document.getElementById('error-msg');
